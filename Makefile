@@ -2,9 +2,9 @@
 CC = gcc
 CFLAGS = -g
 BIN_NATIVE = oss
-BIN_TARGET = usr
+BIN_TARGET = user
 OBJ_NATIVE = oss.o
-OBJ_TARGET = usr.o
+OBJ_TARGET = user.o
 
 .SUFFIXES:
 .SUFFIXES: .c .o .h
@@ -15,8 +15,8 @@ $(BIN_NATIVE): $(OBJ_NATIVE)
 $(BIN_TARGET): $(OBJ_TARGET)
 	$(CC) -o $(BIN_TARGET) $(OBJ_TARGET) -lpthread
 $(OBJ_NATIVE): oss.c
-	$(CC) $(CFLAGS) -c oss.c shmem.h
-$(OBJ_TARGET): usr.c
-	$(CC) $(CFLAGS) -c usr.c shmem.h
+	$(CC) $(CFLAGS) -c oss.c sharememory.h
+$(OBJ_TARGET): user.c
+	$(CC) $(CFLAGS) -c user.c sharememory.h
 clean:
 	/bin/rm -f *.o $(BIN_NATIVE) $(BIN_TARGET)
