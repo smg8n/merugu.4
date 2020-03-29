@@ -13,6 +13,7 @@
 #include <sys/shm.h>
 #include <stdio.h>
 #include <signal.h>
+#include <string.h>
 
 
 #define ONE_BILLION 1000000000

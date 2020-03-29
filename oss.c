@@ -140,7 +140,7 @@ struct clock seconds_to_clock(long double seconds);
 struct clock calculate_avg_time(struct clock clk, int divisor);
 struct clock subtract_clocks(struct clock c1, struct clock c2);
 void print_clock(char* name, struct clock clk);
-void  optset(argc, argv);
+static void optset (int argc, char* argv[]);
 
 
 // Globals used in signal handler
@@ -208,6 +208,11 @@ int main (int argc, char* argv[]) {
 
     // Round robin queue and Multi-level feedback queues
     struct Queue roundRobin1, roundRobin2, level1, level2;
+    memset(&roundRobin1, 0, sizeof(struct Queue));
+    memset(&roundRobin2, 0, sizeof(struct Queue));
+    memset(&level1, 0, sizeof(struct Queue));
+    memset(&level2, 0, sizeof(struct Queue));
+
     // Blocked queue
     unsigned int blocked[PROC_CTRL_TBL_SZE];
     for (i = 0; i < PROC_CTRL_TBL_SZE; i++) {
@@ -891,7 +896,7 @@ void print_clock(char* name, struct clock clk) {
 
 static void helpme();
 
-void optset(int argc, char *argv[])
+static void optset(int argc, char *argv[])
 {
 	int choice;
 	while((choice = getopt(argc, argv, "hn:")) != -1)
