@@ -889,6 +889,8 @@ void print_clock(char* name, struct clock clk) {
     printf("%-15s: %ld:%ld\n", name, clk.seconds, clk.nanoseconds);
 }
 
+static void helpme();
+
 void optset(int argc, char *argv[])
 {
 	int choice;
@@ -917,7 +919,7 @@ void optset(int argc, char *argv[])
 	}
 }
 
-void helpme()
+static void helpme()
 {
 	printf("\n|HELP|MENU|\n\n");
   printf("\t-h : display help menu\n");
