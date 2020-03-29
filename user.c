@@ -10,7 +10,8 @@
 #include <sys/msg.h>
 #include <sys/types.h>
 #include <string.h>
-#include <errrno.h>
+#include <errno.h>
+#include <time.h>
 
 #include "sharememory.h"
 #include "queue.h"
@@ -22,23 +23,30 @@ int tousr;
 int tooss;
 int entire = 1;
 int pcaps = 18;
+
 typedef struct 
 {
 	long msgtype;
 	char message[100];
 	char quantum[100];
-} msg;
+} oss_msg_t;
 
 void sminit();
 void msginit();
-int uspsdispatch(int, msg *, int);
+int uspsdispatch(int, oss_msg_t *, int);
 void timeinc(simclock *, int);
 int findaseat();
 int bitvector(int);
 void clockinc(simclock *, int, int);
 
+/*
+ * static functions
+ */
+static int findapid(int pid);
+
 int main(int argc, char *argv[])
 {
+    oss_msg_t msg;
 
     sminit();
 
@@ -55,7 +63,7 @@ int main(int argc, char *argv[])
 
 	while(1)
 	{
-		msgrcv(tousr, &msg, sizeof(msg), pid, 0)
+		msgrcv(tousr, &msg, sizeof(oss_msg_t), pid, 0);
 
 		/* if the process decides that it will go terminate */
 		if(((rand() % 100) <= probthatprocterminates))
@@ -69,13 +77,13 @@ int main(int argc, char *argv[])
 					exit(EXIT_FAILURE);
 			}
 
-			char* tspercent[20];
+			char tspercent[20];
 			int tsamount = (rand() % 100);
 			sprintf(tspercent, "%i", tsamount);
 			msg.msgtype = pid;
 
 			strcpy(msg.message, tspercent);
-			if((uspsdispatch(tooss, &msg, sizeof(msg))) == -1)
+			if((uspsdispatch(tooss, &msg, sizeof(oss_msg_t))) == -1)
 			{
 					perror("\nusr: error: failed to dispatch");
 					exit(EXIT_FAILURE);
@@ -95,7 +103,7 @@ int main(int argc, char *argv[])
 				msg.msgtype = pid;
 				strcpy(msg.message, "EXHAUSTED");
 				
-				if((uspsdispatch(tooss, &msg, sizeof(msg))) == -1)
+				if((uspsdispatch(tooss, &msg, sizeof(oss_msg_t))) == -1)
 				{
 					perror("\nusr: error: failed to dispatch");
 					exit(EXIT_FAILURE);
@@ -112,13 +120,13 @@ int main(int argc, char *argv[])
 				clockinc(&(blockout), r, s);
 				clockinc(&(smseg->pctable[findapid(pid)].smblktime), r, s);
 
-				char* pconv[20];
+				char pconv[20];
 				sprintf(pconv, "%i", p);
 
 				msg.msgtype = pid;
 				strcpy(msg.message, "SLICED");
 				
-				if((uspsdispatch(tooss, &msg, sizeof(msg))) == -1)
+				if((uspsdispatch(tooss, &msg, sizeof(oss_msg_t))) == -1)
 				{
 					perror("\nusr: error: failed to dispatch");
 					exit(EXIT_FAILURE);
@@ -127,7 +135,7 @@ int main(int argc, char *argv[])
 				msg.msgtype = pid;
 				strcpy(msg.message, pconv);
 				
-				if((uspsdispatch(tooss, &msg, sizeof(msg))) == -1)
+				if((uspsdispatch(tooss, &msg, sizeof(oss_msg_t))) == -1)
 				{
 					perror("\nusr: error: failed to dispatch");
 					exit(EXIT_FAILURE);
@@ -144,14 +152,15 @@ int main(int argc, char *argv[])
 
 				msg.msgtype = pid;
 				strcpy(msg.message, "FINALIZED");
-				msgsnd(toss, &msg, sizeof(msg), IPC_NOWAIT);
+				msgsnd(tooss, &msg, sizeof(oss_msg_t), IPC_NOWAIT);
 			}
 
 		}
 	}
     return 0;
 }
-int findapid(int pid)
+
+static int findapid(int pid)
 {
 	int searcher;
 	for(searcher = 0; searcher < pcaps; searcher++)
@@ -163,6 +172,7 @@ int findapid(int pid)
 	}
 	return -1;
 }
+
 void clockinc(simclock* khronos, int sec, int nan)
 {
 	khronos->secs = khronos->secs + sec;
@@ -179,7 +189,8 @@ void timeinc(simclock* khronos, int duration)
 	}
 	khronos->nans = temp;
 }
-int uspsdispatch(int id, msg * buf, int size);
+
+int uspsdispatch(int id, oss_msg_t * buf, int size)
 {
 	int result;
 	if((result = msgsnd(id, buf, size, 0)) == -1)
@@ -188,6 +199,7 @@ int uspsdispatch(int id, msg * buf, int size);
 	}
 	return(result);
 }
+
 void msginit()
 {
 	key_t msgkey = ftok("msg1", 825);
