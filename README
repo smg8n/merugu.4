@@ -1,0 +1,27 @@
+INTRODUCTION
+------------
+The goal of this homework is to implement time-based scheduling using message queues for synchronization.
+
+COMPILATION
+-----------
+To compile, open a new CLI window, change the 
+directory nesting your module. Type:
+
+  make
+  
+To remove object files,type:
+  make clean
+
+EXECUTION
+---------
+
+To run it simply type: ./oss
+
+Default output log file is 	log.txt
+  
+Version Control
+----------------------
+For Version Control i have used github.
+/classes/OS/merugu/merugu.3/git_log
+
+git log has placed in git_log.txt file 
