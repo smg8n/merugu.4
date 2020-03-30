@@ -40,6 +40,7 @@ void fork_child(char** execv_arr, int child_idx, int pid);
 struct clock convertToClockTime(int nanoseconds);
 bool process_is_realtime();
 unsigned int get_amt_time_to_schedule();
+void print_and_write_with_limit(char* str);
 void print_and_write(char* str);
 struct Statistics get_new_stats();
 
@@ -76,6 +77,7 @@ struct clock calculate_avg_time(struct clock clk, int divisor);
 struct clock subtract_clocks(struct clock c1, struct clock c2);
 void print_clock(char* name, struct clock clk);
 static void optset (int argc, char* argv[]);
+static void log_string(FILE *log_fp,const char* msg);
 
 
 // Globals used in signal handler
@@ -222,7 +224,7 @@ int main (int argc, char* argv[]) {
                 enqueue(&queue_arr[q_idx], proc_ctrl_blk.pid);
                 sprintf(buffer, "OSS: Generating process with PID %d at putting it in queue %d at time %ld:%ld\n",
                     proc_ctrl_blk.pid, q_idx, sysclock->seconds, sysclock->nanoseconds);
-                print_and_write(buffer);
+                print_and_write_with_limit(buffer);
 
                 num_procs_spawned++;
 
@@ -247,7 +249,7 @@ int main (int argc, char* argv[]) {
                 // Unblock process
                 sprintf(buffer, "OSS: Removing process %d from the blocked queue\n", 
                     blocked[i]);
-                print_and_write(buffer);
+                print_and_write_with_limit(buffer);
                 blocked[i] = 0;
                 pcb->status = READY;
                 if (pcb->is_realtime) {            
@@ -291,11 +293,11 @@ int main (int argc, char* argv[]) {
         send_msg(scheduler_id, &scheduler, pcb->pid);
         sprintf(buffer, "OSS: Dispatching process with PID %d from queue %d at time %ld:%ld\n", 
             pcb->pid, (q_idx), sysclock->seconds, sysclock->nanoseconds);
-        print_and_write(buffer);
+        print_and_write_with_limit(buffer);
 
         sprintf(buffer, "OSS: Total time this dispatch was %d nanoseconds\n", 
             nanosecs);
-        print_and_write(buffer);
+        print_and_write_with_limit(buffer);
 
         // Keep track of time it took to scheduled for statistics
         stats.turnaround_time += nanosecs;
@@ -305,7 +307,7 @@ int main (int argc, char* argv[]) {
         receive_msg(scheduler_id, &scheduler, (pcb->pid + PROC_CTRL_TBL_SZE)); // Add PROC_CTRL_TBL_SZE to message type
         sprintf(buffer, "OSS: Receiving that process with PID %d ran for %ld nanoseconds\n", 
             pcb->pid, pcb->last_run);
-        print_and_write(buffer);
+        print_and_write_with_limit(buffer);
 
         increment_clock(sysclock, pcb->last_run);
 
@@ -315,7 +317,7 @@ int main (int argc, char* argv[]) {
             pcb_in_use[pcb->pid] = 0;
             sprintf(buffer, "OSS: Process %d terminated\n", 
                 pcb->pid);
-            print_and_write(buffer);
+            print_and_write_with_limit(buffer);
             stats.total_cpu_time = add_clocks(stats.total_cpu_time, pcb->cpu_time_used);
             stats.total_sys_time = add_clocks(stats.total_sys_time, pcb->sys_time_used);
             struct clock idle = subtract_clocks(stats.total_sys_time, stats.total_cpu_time);
@@ -325,7 +327,7 @@ int main (int argc, char* argv[]) {
             // Place in blocked queue
             sprintf(buffer, "OSS: Process %d is blocked and did not use its entire timeslice", 
                 pcb->pid);
-            print_and_write(buffer);
+            print_and_write_with_limit(buffer);
             for (i = 0; i < PROC_CTRL_TBL_SZE; i++) {
                 if (blocked[i] > 0) {
                     continue;
@@ -340,7 +342,7 @@ int main (int argc, char* argv[]) {
         else {
             sprintf(buffer, "OSS: Process %d used its entire timeslice and is not blocked\n", 
                 pcb->pid);
-            print_and_write(buffer);
+            print_and_write_with_limit(buffer);
             if ( (q_idx == 0) || (q_idx == (NUM_QUEUES - 1)) ) {
                 // Process is a realtime process
                 // OR process was dequeued from level 3 queue
@@ -352,14 +354,14 @@ int main (int argc, char* argv[]) {
             enqueue(&queue_arr[q_idx + 1], pcb->pid);
             sprintf(buffer, "OSS: Putting process with PID %d into queue %d", 
                 pcb->pid, q_idx + 1);
-            print_and_write(buffer);
+            print_and_write_with_limit(buffer);
             
             // Update processes' time quantum
             pcb->time_quantum = (int) BASE_TIME_QUANTUM * pow(2, q_idx + 1);
         }
         
         sprintf(buffer, "\n");
-        print_and_write(buffer);
+        print_and_write_with_limit(buffer);
         
         waitpid(-1, NULL, WNOHANG); // Cleanup any zombies as we go
         
@@ -541,6 +543,11 @@ void cleanup_and_exit() {
     cleanup_shared_memory(proc_ctrl_tbl_id, pct);
     fclose(fp);
     exit(0);
+}
+
+void print_and_write_with_limit(char* str) {
+    fputs(str, stdout);
+    log_string(fp, str);
 }
 
 void print_and_write(char* str) {
@@ -865,3 +872,20 @@ static void helpme()
   printf("\t-h : display help menu\n");
 	printf("\t-n : specify number of processes\n");
 }
+/*
+ * terminate logging after 10000 lines
+ */
+static int lines_logged = 0;
+#define MAX_LINES_TO_LOG 10000
+static void log_string(FILE *log_fp,const char* msg)
+{
+    if ( MAX_LINES_TO_LOG == lines_logged )
+      return;
+    fprintf(log_fp, msg);
+    if (strchr(msg, '\n') != NULL)
+      ++lines_logged;
+    if ( MAX_LINES_TO_LOG == lines_logged ) {
+      fprintf(log_fp, "*** Line count reached %d, will terminate logging ****\n", MAX_LINES_TO_LOG);
+    }
+}
+
