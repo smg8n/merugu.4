@@ -192,7 +192,7 @@ int main (int argc, char* argv[]) {
                 struct process_ctrl_block proc_ctrl_blk = {
                     .pid = i,
                     .status = READY,
-                    .is_realtime = process_is_realtime(),
+                    .is_realtime = 0, // process_is_realtime(), // *** According to professor, realtime priority shouldn't be used ***
                     .time_quantum = BASE_TIME_QUANTUM, 
                     .cpu_time_used.seconds = 0, .cpu_time_used.nanoseconds = 0,
                     .sys_time_used.seconds = 0, .sys_time_used.nanoseconds = 0,
