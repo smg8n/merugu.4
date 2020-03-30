@@ -192,7 +192,7 @@ int main (int argc, char* argv[]) {
                 struct process_ctrl_block proc_ctrl_blk = {
                     .pid = i,
                     .status = READY,
-                    .is_realtime = 0, // process_is_realtime(), // *** According to professor, realtime priority shouldn't be used ***
+                    .is_realtime = 0, // process_is_realtime(), 
                     .time_quantum = BASE_TIME_QUANTUM, 
                     .cpu_time_used.seconds = 0, .cpu_time_used.nanoseconds = 0,
                     .sys_time_used.seconds = 0, .sys_time_used.nanoseconds = 0,
@@ -222,7 +222,7 @@ int main (int argc, char* argv[]) {
                 // Fork and place in queue
                 fork_child(execv_arr, num_procs_spawned, proc_ctrl_blk.pid);
                 enqueue(&queue_arr[q_idx], proc_ctrl_blk.pid);
-                sprintf(buffer, "OSS: Generating process with PID %d at putting it in queue %d at time %ld:%ld\n",
+                sprintf(buffer, "OSS: Generating process with PID %d and putting it in queue %d at time %ld:%ld\n",
                     proc_ctrl_blk.pid, q_idx, sysclock->seconds, sysclock->nanoseconds);
                 print_and_write_with_limit(buffer);
 
@@ -346,7 +346,7 @@ int main (int argc, char* argv[]) {
             if ( (q_idx == 0) || (q_idx == (NUM_QUEUES - 1)) ) {
                 // Process is a realtime process
                 // OR process was dequeued from level 3 queue
-                // So decement queue idx to insert the process back into the same queue
+                // So decrement queue idx to insert the process back into the same queue
                 q_idx--;
             }
 
