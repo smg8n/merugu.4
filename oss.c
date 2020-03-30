@@ -371,7 +371,7 @@ int main (int argc, char* argv[]) {
     }
 
     // Print information before exiting
-   /* sprintf(buffer, "OSS: Exiting because 100 processes have been spawned or because %d seconds have been passed\n", TOTAL_RUNTIME);
+    sprintf(buffer, "OSS: Exiting because 100 processes have been spawned or because %d seconds have been passed\n", TOTAL_RUNTIME);
     print_and_write(buffer);
 
     char formatstr[50] = "%-24s: %'10ld:%'12ld\n";
@@ -408,7 +408,7 @@ int main (int argc, char* argv[]) {
         stats.idle_time.seconds, stats.idle_time.nanoseconds);
     print_and_write(buffer);
     
-    sprintf(buffer, "%s\n", "====================================================");*/
+    sprintf(buffer, "%s\n", "====================================================");
     print_and_write(buffer);
 
     cleanup_and_exit();
