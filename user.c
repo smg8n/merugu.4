@@ -22,7 +22,7 @@ const unsigned int TOTAL_PROC_LIMIT = 100;
 const unsigned int MAX_RUNTIME = 20; // In seconds
 
 const unsigned int MAX_NS_BEFORE_NEW_PROC = TWO_BILLION;
-const unsigned int PCT_REALTIME = 3;
+const unsigned int PCT_REALTIME = 5;
 const unsigned int BASE_TIME_QUANTUM = TEN_MILLION; // 10 ms == 10 million nanoseconds
 
 
