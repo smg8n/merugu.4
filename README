@@ -22,6 +22,6 @@ Default output log file is 	log.txt
 Version Control
 ----------------------
 For Version Control i have used github.
-/classes/OS/merugu/merugu.3/git_log
+/classes/OS/merugu/merugu.4/git_log
 
-git log has placed in git_log.txt file 
+git log has been placed in git_log.txt file 
