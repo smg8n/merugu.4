@@ -19,6 +19,13 @@ To run it simply type: ./oss
 
 Default output log file is 	log.txt
   
+the processes Run for a small amount of time quantum and terminate.
+the processes Run for a portion of the quantum and get preempted.
+the processes Run for a portion of the quantum and get blocked by an incoming event.
+the processes Run for a full quantum and get rescheduled.
+  
+  
+  
 Version Control
 ----------------------
 For Version Control i have used github.
