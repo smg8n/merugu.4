@@ -23,10 +23,10 @@ The sheduler prevents process aging by making sure it visits each queue and
 visits each process before moving on to schedule more processes making sure each process gets cpu time. 
 Every process will get a chance to run each cycle of the scheduler.  
   
-the processes Run for a small amount of time quantum and terminate.
-the processes Run for a portion of the quantum and get preempted.
-the processes Run for a portion of the quantum and get blocked by an incoming event.
-the processes Run for a full quantum and get rescheduled.
+The processes run for a small amount of time quantum and terminate.
+The processes run for a portion of the quantum and get preempted.
+The processes run for a portion of the quantum and get blocked by an incoming event.
+The processes run for a full quantum and get rescheduled.
   
   
   
