@@ -19,6 +19,10 @@ To run it simply type: ./oss
 
 Default output log file is 	log.txt
   
+The sheduler prevents process aging by making sure it visits each queue and 
+visits each process before moving on to schedule more processes making sure each process gets cpu time. 
+Every process will get a chance to run each cycle of the scheduler.  
+  
 the processes Run for a small amount of time quantum and terminate.
 the processes Run for a portion of the quantum and get preempted.
 the processes Run for a portion of the quantum and get blocked by an incoming event.
