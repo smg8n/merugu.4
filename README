@@ -33,6 +33,6 @@ The processes run for a full quantum and get rescheduled.
 Version Control
 ----------------------
 For Version Control i have used github.
-/classes/OS/merugu/merugu.4/git_log
+/classes/OS/merugu/merugu.4/git_log.txt
 
 git log has been placed in git_log.txt file 
